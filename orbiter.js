@@ -562,6 +562,10 @@ void draw() {
         doTimestep();
     }
 
+    text("Remaining Fuel (kg)", 170, height - 13);
+    text("Altitude (m)", 340, height - 13);
+    text("Velocity (X Y) (m/s)", 500, height - 13);
+
     drawGraphs();
     planet.display();
     rocket.display();

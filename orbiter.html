@@ -2,19 +2,11 @@
 <body>
 <form>
     <script src="processing-0.9.7.js"></script>
-    <canvas style="float: left;" data-processing-sources="orbiter.js" width="800" height="800"></canvas>
-    <fieldset>
-        <label for="fuel">Remaining Fuel (kg)</label>
-        <input id="fuel" type="text" />
-    </fieldset>
-    <fieldset>
-        <label for="altitude">Altitude (m)</label>
-        <input id="altitude" type="text" />
-    </fieldset>
-    <fieldset>
-        <label for="velocity">Velocity (X Y) (m/s)</label>
-        <input id="velocity" type="text" />
-    </fieldset>
+    <button id="reset">Reset</button>
+    <button id="play_pause">Play/Pause</button>
+    <button id="ballistic">Load Ballstic Trajectory</button>
+    <button id="orbit">Load Orbital Trajectory</button>
+    <canvas style="float: right;" data-processing-sources="orbiter.js" width="800" height="800"></canvas>
     <fieldset>
         <label for="destination_altitude">Final Altitude (km)</label>
         <input id="destination_altitude" type="text" />
@@ -63,16 +55,6 @@
         <label for="minimum_thrust">Minimum Thrust (%)</label>
         <input id="minimum_thrust" type="text" />
     </fieldset>
-    <fieldset>
-        <label for="planet">Planet</label>
-        <select id=planet">
-            <option id="earth">Earth</option>
-        </select>
-    </fieldset>
-    <button id="reset">Reset</button>
-    <button id="play_pause">Play/Pause</button>
-    <button id="ballistic">Load Ballstic Trajectory</button>
-    <button id="orbit">Load Orbital Trajectory</button>
 </form>
     <script type="text/javascript"
         src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js">
