@@ -132,7 +132,7 @@ class Graph {
 
     }
 
-    public void add(double value) {
+    public void add(float value) {
         mData.add(value);
     }
 
@@ -166,15 +166,17 @@ class Graph {
         text(mName, 0, 0);
         popMatrix();
 
-        Iterator it = mData.iterator();
         int time = 0;
         noFill();
-        beginShape();
-        while(it.hasNext()) {
-            float value = map(((Number)it.next()).floatValue(), mMin, mMax, 0, 100);
-            vertex(map((float)time++, 0, timestep, 0, 80), -constrain(value, 0, 100));
+        if(mData.size() > 0) {
+            beginShape();
+            for(int i = 0; i < mData.size(); i++) {
+                float value = float(mData.get(i));
+                float value = map(float(value), mMin, mMax, 0, 100);
+                vertex(map((float)time++, 0, timestep, 0, 80), -constrain(value, 0, 100));
+            }
+            endShape();
         }
-        endShape();
         popMatrix();
     }
 }
@@ -199,10 +201,10 @@ class Graph {
 */
 class Planet {
     private String mName;
-    private double mGravity;
-    private double mBaseAtmosphereMassDensity;
+    private float mGravity;
+    private float mBaseAtmosphereMassDensity;
 
-    Planet(String name, double gravity, double atmosphereDensity) {
+    Planet(String name, float gravity, float atmosphereDensity) {
         mName = name;
         mGravity = gravity;
         mBaseAtmosphereMassDensity = atmosphereDensity;
@@ -215,11 +217,11 @@ class Planet {
         popMatrix();
     }
 
-    public void setGravity(double gravity) {
+    public void setGravity(float gravity) {
         mGravity = gravity;
     }
 
-    public void setBaseAtmosphereMassDensity(double density) {
+    public void setBaseAtmosphereMassDensity(float density) {
         mBaseAtmosphereMassDensity = density;
     }
 
@@ -227,11 +229,11 @@ class Planet {
         mName = name;
     }
 
-    public double getGravity() {
+    public float getGravity() {
         return mGravity;
     }
 
-    public double getAtmosphereMassDensity(double altitude) {
+    public float getAtmosphereMassDensity(float altitude) {
         return  mBaseAtmosphereMassDensity * exp((float)(-altitude / 10000));
     }
 
@@ -259,21 +261,21 @@ class Rocket {
     int mDestinationVelocityMPerS; // x velocity
     int mVelocityXMPerS;
     int mVelocityYMPerS;
-    double mAccelerationXMPerS;
-    double mAccelerationYMPerS;
+    float mAccelerationXMPerS;
+    float mAccelerationYMPerS;
     int mMassKg;
-    double mFootprintM2;
-    double mDragCoefficient;
+    float mFootprintM2;
+    float mDragCoefficient;
     Fuel mFuel;
     int mAltitudeM;
     int mEarthPositionM;
     int mTurnBeginAltitudeM;
     int mTurnFinishAltitudeM;
-    double mAngle;
+    float mAngle;
 
-    Rocket(int mass, double footprint, Fuel fuel,
+    Rocket(int mass, float footprint, Fuel fuel,
             int destinationAltitude, int destinationVelocity, 
-            double dragCoefficient, int turnBeginAltitude, int
+            float dragCoefficient, int turnBeginAltitude, int
             turnFinishAltitude) {
         mMassKg = mass;
         mFootprintM2 = footprint;
@@ -340,41 +342,41 @@ class Rocket {
     }
 
     void doTimestep() {
-        double previousAltitude = mAltitudeM;
-        double angleFromCenter; 
+        float previousAltitude = mAltitudeM;
+        float angleFromCenter; 
         if(mEarthPositionM == 0) {
             angleFromCenter = 0;
         } else {
             angleFromCenter = atan(mAltitudeM / mEarthPositionM);
         }
         int totalThrust = getFuel().burn(getAltitude()); //subtracts mass
-        double thrustX = sin(radians((float)mAngle)) * totalThrust;
-        double thrustY = cos(radians((float)mAngle)) * totalThrust;
+        float thrustX = sin(radians((float)mAngle)) * totalThrust;
+        float thrustY = cos(radians((float)mAngle)) * totalThrust;
 
         /** TODO this isn't quite right...not sure how to simulate
         ** gravity in a certain direction. we don't want to slow down
         ** horizontal velocity, but it's tricky since "horizontal"
         ** changes meaning as you travel across the planet */
-        //double gravityXN = sin(radians((float) angleFromCenter)) * 
-        //       ((Planet)(planetMap.get(currentPlanetId))).getGravity()
+        //float gravityXN = sin(radians((float) angleFromCenter)) * 
+        //       planet.getGravity()
          //      * rocket.getTotalMass();
          //
-        //double gravityYN = cos(radians((float) angleFromCenter)) * 
-        //        ((Planet)(planetMap.get(currentPlanetId))).getGravity()
+        //float gravityYN = cos(radians((float) angleFromCenter)) * 
+        //        planet.getGravity()
         //        * rocket.getTotalMass();
-        double gravityXN = 0;
-        double gravityYN =  
-                ((Planet)(planetMap.get(currentPlanetId))).getGravity()
+        float gravityXN = 0;
+        float gravityYN =  
+                planet.getGravity()
                 * getTotalMass();
 
-        double dragXN = .5
-                * ((Planet)(planetMap.get(currentPlanetId)))
+        float dragXN = .5
+                * planet
                     .getAtmosphereMassDensity(getAltitude())
                 * pow((float)getHorizontalVelocity(), 2)
                 * getDragCoefficient() // this is not accurate - different for x 
                 * getFootprint();
-        double dragYN = .5
-                * ((Planet)(planetMap.get(currentPlanetId)))
+        float dragYN = .5
+                * planet
                     .getAtmosphereMassDensity(getAltitude())
                 * pow((float)getVerticalVelocity(), 2)
                 * getDragCoefficient()
@@ -412,11 +414,11 @@ class Rocket {
             simulationRunning = false;
     }
 
-    double getHorizontalAcceleration() {
+    float getHorizontalAcceleration() {
         return mAccelerationXMPerS;
     }
 
-    double getVerticalAcceleration() {
+    float getVerticalAcceleration() {
         return mAccelerationYMPerS;
     }
 
@@ -428,7 +430,7 @@ class Rocket {
         return mMassKg;
     }
 
-    double getFootprint() {
+    float getFootprint() {
         return mFootprintM2;
     }
 
@@ -440,7 +442,7 @@ class Rocket {
         return mVelocityYMPerS;
     }
 
-    double getDragCoefficient() {
+    float getDragCoefficient() {
         return mDragCoefficient;
     }
 
@@ -536,11 +538,6 @@ class Rocket {
 **    * calculateFuelRequired
 */
 
-import controlP5.Button;
-import controlP5.Textfield;
-import controlP5.Textlabel;
-import controlP5.ScrollList;
-
 /** Screen Constants **/
 int LAUNCHPAD_X;
 int LAUNCHPAD_Y;
@@ -552,24 +549,7 @@ int currentPlanetId = 1;
 int startingMass;
 
 Rocket rocket;
-HashMap planetMap;
-
-Textfield destinationAltitudeField;
-Textfield destinationVelocityField;
-Textfield rocketMassField;
-Textfield rocketFootprintField;
-Textfield rocketDragCoefficientField;
-Textfield fuelExitVelocityField;
-Textfield fuelFlowRateField;
-Textfield fuelAmountField;
-Textfield turnBeginAltitudeField;
-Textfield turnFinishAltitudeField;
-Textfield minimumThrustAltitudeField;
-Textfield minimumThrustPercentageField;
-
-Textlabel fuelLabel;
-Textlabel altitudeLabel;
-Textlabel velocityLabel;
+Planet planet;
 
 Graph gravityGraph;
 Graph thrustGraph;
@@ -583,6 +563,7 @@ Graph altitudeGraph;
 Graph massGraph;
 
 void setup() {
+    frameRate(30);
     size(800, 800);
     LAUNCHPAD_X = width / 5;
     LAUNCHPAD_Y = height - 80;
@@ -598,68 +579,31 @@ void setup() {
     thrustGraph = new Graph("thrust", width - 240, 590, 0, 0);
     altitudeGraph = new Graph("alt", width - 110, 590, 0, 0);
 
-    planetMap = new HashMap();
-    planetMap.put(1, new Planet("Earth", 9.822, 1.293));
-
-    fuelLabel = controlP5.addTextlabel(
-            "fuelLabel", "", 150, height - 20);
-    altitudeLabel = controlP5.addTextlabel(
-            "altitudeLabel", "Altitude (m)", 310, height - 20);
-    velocityLabel = controlP5.addTextlabel(
-            "velocityLabel", "Velocity (X Y) (m/s)", 450, height - 20);
-    
-    destinationAltitudeField = controlP5.addTextfield(
-            "destinationAltitude", 10, 10, 120, 20);
-    destinationAltitudeField.setLabel("Final Altitude (km)");
-    destinationVelocityField = controlP5.addTextfield(
-            "destinationVelocity", 10, 50, 120, 20);
-    destinationVelocityField.setLabel("Final Velocity (km/s)");
-    rocketMassField = controlP5.addTextfield("rocketMass", 10, 90, 120, 20);
-    rocketMassField.setLabel("Empty Rocket Mass (kg)");
-    rocketFootprintField = controlP5.addTextfield(
-            "rocketFootprint", 10, 130, 120, 20);
-    rocketFootprintField.setLabel("Rocket Drag Footprint (m^2)");
-    rocketDragCoefficientField = controlP5.addTextfield(
-            "rocketDragCoefficient", 10, 170, 120, 20);
-    rocketDragCoefficientField.setLabel("Rocket Drag Coeff.");
-    fuelExitVelocityField = controlP5.addTextfield("fuelExitVelocity", 10, 210, 120, 20);
-    fuelExitVelocityField.setLabel("Fuel Exit Velocity (m/s)");
-    fuelFlowRateField = controlP5.addTextfield("fuelFlowRate", 10, 250, 120, 20);
-    fuelFlowRateField.setLabel("Fuel Flow Rate (kg/s)");
-    fuelAmountField = controlP5.addTextfield("fuelAmount", 10, 290, 120, 20);
-    fuelAmountField.setLabel("Amount of Fuel (kg)");
-    turnBeginAltitudeField = controlP5.addTextfield("turnBeginAltitude", 10, 330, 120, 20);
-    turnBeginAltitudeField.setLabel("Turn Start Altitude (m)");
-    turnFinishAltitudeField = controlP5.addTextfield("turnFinishAltitude", 10, 370, 120, 20);
-    turnFinishAltitudeField.setLabel("Turn Finish Altitude (m)");
-    minimumThrustAltitudeField = 
-            controlP5.addTextfield("minimumThrustAltitude", 10, 410, 120, 20);
-    minimumThrustAltitudeField.setLabel("Minimum Thrust Altitude (m)");
-    minimumThrustPercentageField =
-        controlP5.addTextfield("minimumThrustPercentage", 10, 450, 120, 20);
-    minimumThrustPercentageField.setLabel("Minimum Thrust Percentage");
-
-    ScrollList list = controlP5.addScrollList("planet", 10, 500, 120, 100);
-    Iterator it = planetMap.entrySet().iterator();
-    while(it.hasNext()) {
-        Map.Entry entry = (Map.Entry) it.next();
-        Planet p = (Planet) entry.getValue();
-        list.addItem(p.getName(), (Integer) entry.getKey());
-    }
-
-    Button button = controlP5.addButton("reset", 0, 10, 530, 120, 20);
-    button.setLabel("Save Values & Reset Sim");
-    button = controlP5.addButton("playPause", 2, 10, 560, 120, 20);
-    button.setLabel("Play/Pause");
-    button = controlP5.addButton("loadBallistic", 2, 10, 590, 120, 20);
-    button.setLabel("Load Ballistic Missile");
-    button = controlP5.addButton("loadOrbit", 2, 10, 620, 120, 20);
-    button.setLabel("Load LEO");
-    button = controlP5.addButton("save", 2, 10, 700, 120, 20);
-    button.setLabel("Save Run to CSV");
+    planet = new Planet("Earth", 9.822, 1.293);
 
     loadOrbit(0);
     reset(0);
+
+    $('#play_pause').click(function(event) {
+        playPause();
+        event.preventDefault();
+    });
+    $('#reset').click(function(event) {
+        reset();
+        event.preventDefault();
+    });
+    $('#ballistic').click(function(event) {
+        loadBallistic();
+        event.preventDefault();
+    });
+    $('#orbit').click(function(event) {
+        loadOrbit();
+        event.preventDefault();
+    });
+    $('#save').click(function(event) {
+        save();
+        event.preventDefault();
+    });
 }
 
 void draw() {
@@ -673,70 +617,42 @@ void draw() {
         doTimestep();
     }
 
-    fuelLabel.draw(this);
-    altitudeLabel.draw(this);
-    velocityLabel.draw(this);
-
     drawGraphs();
-    ((Planet)(planetMap.get(currentPlanetId))).display();
+    planet.display();
     rocket.display();
 }
 
-public void save(int value) {
-    PrintWriter output;
-    String savePath = selectOutput();
-    if(savePath != null) {
-        output = createWriter(savePath);
-
-        output.print("time\t");
-        output.print(accelerationXGraph.getName() + "\t");
-        output.print(accelerationYGraph.getName() + "\t");
-        output.print(velocityXGraph.getName() + "\t");
-        output.print(velocityYGraph.getName() + "\t");
-        output.print(dragXGraph.getName() + "\t");
-        output.print(dragYGraph.getName() + "\t");
-        output.print(gravityGraph.getName() + "\t");
-        output.print(massGraph.getName() + "\t");
-        output.print(thrustGraph.getName() + "\t");
-        output.print(altitudeGraph.getName() + "\t\n");
-
-        for(int i = 0; i < timestep; i++) {
-            output.print(i + "\t");
-            output.print(accelerationXGraph.get(i) + "\t");
-            output.print(accelerationYGraph.get(i) + "\t");
-            output.print(velocityXGraph.get(i) + "\t");
-            output.print(velocityYGraph.get(i) + "\t");
-            output.print(dragXGraph.get(i) + "\t");
-            output.print(dragYGraph.get(i) + "\t");
-            output.print(gravityGraph.get(i) + "\t");
-            output.print(massGraph.get(i) + "\t");
-            output.print(thrustGraph.get(i) + "\t");
-            output.print(altitudeGraph.get(i) + "\t\n");
-        }
-        
-        output.flush();
-        output.close();
-    }
-}
+String destinationAltitudeField = "#destination_altitude";
+String destinationVelocityField = "#destination_velocity";
+String rocketMassField = "#rocket_mass";
+String rocketFootprintField = "#rocket_footprint";
+String rocketDragCoefficientField = "#rocket_drag";
+String fuelExitVelocityField = "#fuel_velocity";
+String fuelFlowRateField = "#fuel_flow";
+String fuelAmountField = "#fuel_amount";
+String turnBeginAltitudeField = "#turn_start";
+String turnFinishAltitudeField = "#turn_finish";
+String minimumThrustAltitudeField = "#minimum_thrust_altitude";
+String minimumThrustPercentageField = "#minimum_thrust";
 
 public void reset(int value) {
     simulationRunning = false;
     timestep = 0;
-    if(fuelAmountField.getText().equals("")) {
-        fuelAmountField.setValue("" + calculateFuelRequired());
+    if($(fuelAmountField).val() == "") {
+        $(fuelAmountField).val(calculateFuelRequired());
     }
-    rocket = new Rocket(Integer.valueOf(rocketMassField.getText()),
-            Double.valueOf(rocketFootprintField.getText()),
-            new Fuel(Integer.valueOf(fuelExitVelocityField.getText()),
-                    Integer.valueOf(fuelFlowRateField.getText()),
-                    Integer.valueOf(fuelAmountField.getText()),
-                    Integer.valueOf(minimumThrustAltitudeField.getText()),
-                    Integer.valueOf(minimumThrustPercentageField.getText())),
-            Integer.valueOf(destinationAltitudeField.getText()) * 1000,
-            Integer.valueOf(destinationVelocityField.getText()),
-            Double.valueOf(rocketDragCoefficientField.getText()),
-            Integer.valueOf(turnBeginAltitudeField.getText()),
-            Integer.valueOf(turnFinishAltitudeField.getText()));
+    rocket = new Rocket(int($(rocketMassField).val()),
+            float($(rocketFootprintField).val()),
+            new Fuel(int($(fuelExitVelocityField).val()),
+                    int($(fuelFlowRateField).val()),
+                    int($(fuelAmountField).val()),
+                    int($(minimumThrustAltitudeField).val()),
+                    int($(minimumThrustPercentageField).val())),
+            int($(destinationAltitudeField).val()) * 1000,
+            int($(destinationVelocityField).val()),
+            float($(rocketDragCoefficientField).val()),
+            int($(turnBeginAltitudeField).val()),
+            int($(turnFinishAltitudeField).val()));
     massGraph.setMax(rocket.getTotalMass());
     gravityGraph.setMax(rocket.getTotalMass() * 20);
 
@@ -753,34 +669,34 @@ public void reset(int value) {
 }
 
 public void loadBallistic(int value) {
-    destinationAltitudeField.setValue("" + 100);
-    destinationVelocityField.setValue("" + 1500);
-    rocketMassField.setValue("" + 2000);
-    rocketFootprintField.setValue("" + 2);
-    rocketDragCoefficientField.setValue("" + .6);
-    fuelExitVelocityField.setValue("" + 3000);
-    fuelFlowRateField.setValue("" + 200);
-    fuelAmountField.setValue("" + 5200);
-    turnBeginAltitudeField.setValue("" + 10000);
-    turnFinishAltitudeField.setValue("" + 100000);
-    minimumThrustAltitudeField.setValue("" + 24750);
-    minimumThrustPercentageField.setValue("" + 5);
+    $(destinationAltitudeField).val(100);
+    $(destinationVelocityField).val(1500);
+    $(rocketMassField).val(2000);
+    $(rocketFootprintField).val(2);
+    $(rocketDragCoefficientField).val(.6);
+    $(fuelExitVelocityField).val(3000);
+    $(fuelFlowRateField).val(200);
+    $(fuelAmountField).val(5200);
+    $(turnBeginAltitudeField).val(10000);
+    $(turnFinishAltitudeField).val(100000);
+    $(minimumThrustAltitudeField).val(24750);
+    $(minimumThrustPercentageField).val(5);
     reset(0);
 }
 
 public void loadOrbit(int value) {
-    destinationAltitudeField.setValue("" + 450);
-    destinationVelocityField.setValue("" + 7600);
-    rocketMassField.setValue("" + 2000);
-    rocketFootprintField.setValue("" + 2);
-    rocketDragCoefficientField.setValue("" + .6);
-    fuelExitVelocityField.setValue("" + 3500);
-    fuelFlowRateField.setValue("" + 250);
-    fuelAmountField.setValue("" + 45000);
-    turnBeginAltitudeField.setValue("" + 10000);
-    turnFinishAltitudeField.setValue("" + 450000);
-    minimumThrustAltitudeField.setValue("" + 95000);
-    minimumThrustPercentageField.setValue("" + 23);
+    $(destinationAltitudeField).val(450);
+    $(destinationVelocityField).val(7600);
+    $(rocketMassField).val(2000);
+    $(rocketFootprintField).val(2);
+    $(rocketDragCoefficientField).val(.6);
+    $(fuelExitVelocityField).val(3500);
+    $(fuelFlowRateField).val(250);
+    $(fuelAmountField).val(45000);
+    $(turnBeginAltitudeField).val(10000);
+    $(turnFinishAltitudeField).val(450000);
+    $(minimumThrustAltitudeField).val(95000);
+    $(minimumThrustPercentageField).val(23);
     reset(0);
 }
 
@@ -794,10 +710,10 @@ public void planet(int value) {
 
 int calculateFuelRequired() {
     // Tsiolkovsky rocket equation
-    int exitVelocity = Integer.valueOf(fuelExitVelocityField.getText());
-    int m1 = Integer.valueOf(rocketMassField.getText());
-    int deltaV = Integer.valueOf(destinationVelocityField.getText());
-    double m0 = m1 * exp(deltaV / exitVelocity);
+    int exitVelocity = int($(fuelExitVelocityField).val());
+    int m1 = int($(rocketMassField).val());
+    int deltaV = int($(destinationVelocityField).val());
+    float m0 = m1 * exp(deltaV / exitVelocity);
     return (int)(m0 - m1);
 }
 
@@ -821,19 +737,19 @@ void drawGraphs() {
 void doTimestep() {
     timestep++;
     altitudeGraph.add(rocket.getAltitude());
-    gravityGraph.add(((Planet)(planetMap.get(currentPlanetId))).getGravity()
+    gravityGraph.add(planet.getGravity()
             * rocket.getTotalMass());
     // These are calculated in Rocket, which actually uses them to determine
     // acceleration. They are duplicated here but really shouldn't be - redesign
     // the Rocket API in the next iteration so this is less clunky
-    double dragXN = .5
-            * ((Planet)(planetMap.get(currentPlanetId)))
+    float dragXN = .5
+            * planet
                 .getAtmosphereMassDensity(rocket.getAltitude())
             * pow((float)rocket.getHorizontalVelocity(), 2)
             * rocket.getDragCoefficient() // this is not accurate - different for x 
             * rocket.getFootprint();
-    double dragYN = .5
-            * ((Planet)(planetMap.get(currentPlanetId)))
+    float dragYN = .5
+            * planet
                 .getAtmosphereMassDensity(rocket.getAltitude())
             * pow((float)rocket.getVerticalVelocity(), 2)
             * rocket.getDragCoefficient()

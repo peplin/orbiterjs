@@ -1,12 +1,82 @@
 <html>
 <body>
-<script src="processing-0.9.7.js"></script>
-<canvas data-processing-sources="orbiter.js" width="800" height="800"></canvas>
 <form>
+    <script src="processing-0.9.7.js"></script>
+    <canvas style="float: left;" data-processing-sources="orbiter.js" width="800" height="800"></canvas>
     <fieldset>
         <label for="fuel">Remaining Fuel (kg)</label>
         <input id="fuel" type="text" />
     </fieldset>
+    <fieldset>
+        <label for="altitude">Altitude (m)</label>
+        <input id="altitude" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="velocity">Velocity (X Y) (m/s)</label>
+        <input id="velocity" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="destination_altitude">Final Altitude (km)</label>
+        <input id="destination_altitude" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="destination_velocity">Final Velocity (km/s)</label>
+        <input id="destination_velocity" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="rocket_mass">Empty Rocket Mass (kg)</label>
+        <input id="rocket_mass" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="rocket_footprint">Rocket Drag Footprint (m^2)</label>
+        <input id="rocket_footprint" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="rocket_drag">Rocket Drag Coeff.</label>
+        <input id="rocket_drag" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="fuel_velocity">Fuel Exit Velocity (m/s)</label>
+        <input id="fuel_velocity" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="fuel_flow">Fuel Flow Rate (kg/s)</label>
+        <input id="fuel_flow" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="fuel_amount">Amount of Fuel (kg)</label>
+        <input id="fuel_amount" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="turn_start">Turn Start Altitude (m)</label>
+        <input id="turn_start" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="turn_finish">Turn Finish Altitude (m)</label>
+        <input id="turn_finish" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="minimum_thrust_altitude">Minimum Thrust Altitude (m)</label>
+        <input id="minimum_thrust_altitude" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="minimum_thrust">Minimum Thrust (%)</label>
+        <input id="minimum_thrust" type="text" />
+    </fieldset>
+    <fieldset>
+        <label for="planet">Planet</label>
+        <select id=planet">
+            <option id="earth">Earth</option>
+        </select>
+    </fieldset>
+    <button id="reset">Reset</button>
+    <button id="play_pause">Play/Pause</button>
+    <button id="ballistic">Load Ballstic Trajectory</button>
+    <button id="orbit">Load Orbital Trajectory</button>
+    <button id="save">Save to CSV</button>
 </form>
+    <script type="text/javascript"
+        src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js">
+    </script>
 </body>
 </html>
